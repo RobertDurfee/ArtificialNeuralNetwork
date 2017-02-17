@@ -2,10 +2,10 @@
 #define ARTIFICIAL_NEURAL_NETWORK_HEADER
 
 #include "Armadillo\armadillo"	//Col, Mat, set_seed()
-#include <vector>				//vector, swap()
-#include <random>				//default_random_engine, uniform_int_distribution
-#include <chrono>				//system_clock
-#include <fstream>				//ifstream, ofstream
+#include <vector>			//vector, swap()
+#include <random>			//default_random_engine, uniform_int_distribution
+#include <chrono>			//system_clock
+#include <fstream>			//ifstream, ofstream
 
 #pragma comment(lib, "lapack_win64_MT.lib")
 #pragma comment(lib, "blas_win64_MT.lib")
