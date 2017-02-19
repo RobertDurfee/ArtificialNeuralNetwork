@@ -36,6 +36,11 @@ int GetEpoch();
 void SetSizes(vector<int> sizes);
 ```
 
+### Typedefs
+```C++
+typedef vector<vector<Col<double>>> NeuralData;
+```
+
 ### Example
 ```C++
 #include "ArtificialNeuralNetwork.h"
