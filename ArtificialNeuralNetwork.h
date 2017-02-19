@@ -1,7 +1,7 @@
 #ifndef ARTIFICIAL_NEURAL_NETWORK_HEADER
 #define ARTIFICIAL_NEURAL_NETWORK_HEADER
 
-#include "Armadillo\armadillo"	//Col, Mat, set_seed()
+#include <armadillo>    //Mat, Col, set_seed()
 #include <vector>		//vector, swap()
 #include <random>		//default_random_engine, uniform_int_distribution
 #include <chrono>		//system_clock
