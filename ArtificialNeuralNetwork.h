@@ -1,7 +1,7 @@
 #ifndef ARTIFICIAL_NEURAL_NETWORK_HEADER
 #define ARTIFICIAL_NEURAL_NETWORK_HEADER
 
-#include <armadillo>    //Mat, Col, set_seed()
+#include <armadillo>	//Col, Mat, set_seed()
 #include <vector>		//vector, swap()
 #include <random>		//default_random_engine, uniform_int_distribution
 #include <chrono>		//system_clock
@@ -12,6 +12,8 @@
 
 using namespace std;
 using namespace arma;
+
+typedef vector<vector<Col<double>>> NeuralData;
 
 Col<double> ActiviationFunction(Col<double> z)
 {
@@ -25,11 +27,11 @@ Col<double> ActivationFunctionPrime(Col<double> z)
 class NeuralNetwork
 {
 public:
-	NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, vector<vector<Col<double>>>));
-	NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, vector<vector<Col<double>>>));
+	NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData));
+	NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData));
 	
 	Col<double> FeedForward(Col<double> a);
-	void StochasticGradientDescent(vector<vector<Col<double>>> trainingData, int epochs, int miniBatchSize, double eta, vector<vector<Col<double>>> testData);
+	void StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData);
 
 	void Save(string filename);
 	void Open(string filename);
@@ -46,21 +48,21 @@ private:
 	vector<Col<double>> empty_b;
 	vector<Mat<double>> empty_w;
 
-	void(*Evaluate)(NeuralNetwork *, vector<vector<Col<double>>>);
+	void(*Evaluate)(NeuralNetwork *, NeuralData);
 
 	void Backpropogation(Col<double> x, Col<double> y, vector<Col<double>> * delta_nabla_b, vector<Mat<double>> * delta_nabla_w);
 
-	vector<vector<vector<Col<double>>>> SplitIntoMiniBatches(vector<vector<Col<double>>> trainingData, int miniBatchSize);
+	vector<NeuralData> SplitIntoMiniBatches(NeuralData trainingData, int miniBatchSize);
 };
 
-NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, vector<vector<Col<double>>>))
+NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
 	SetSizes(sizes);
 
 	this->Evaluate = Evaluate;
 	Epoch = 0;
 }
-NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, vector<vector<Col<double>>>))
+NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
 	Open(filename);
 
@@ -75,7 +77,7 @@ Col<double> NeuralNetwork::FeedForward(Col<double> a)
 
 	return a;
 }
-void NeuralNetwork::StochasticGradientDescent(vector<vector<Col<double>>> trainingData, int epochs, int miniBatchSize, double eta, vector<vector<Col<double>>> testData)
+void NeuralNetwork::StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData)
 {
 	Epoch = 0;
 
@@ -85,7 +87,7 @@ void NeuralNetwork::StochasticGradientDescent(vector<vector<Col<double>>> traini
 	int n = (int)trainingData.size();
 	for (Epoch = 1; Epoch <= epochs; Epoch++)
 	{
-		vector<vector<vector<Col<double>>>> miniBatches = SplitIntoMiniBatches(trainingData, miniBatchSize);
+		vector<NeuralData> miniBatches = SplitIntoMiniBatches(trainingData, miniBatchSize);
 
 		for (unsigned int miniBatch = 0; miniBatch < miniBatches.size(); miniBatch++)
 		{
@@ -223,13 +225,13 @@ void NeuralNetwork::Backpropogation(Col<double> x, Col<double> y, vector<Col<dou
 	}
 }
 
-vector<vector<vector<Col<double>>>> NeuralNetwork::SplitIntoMiniBatches(vector<vector<Col<double>>> trainingData, int miniBatchSize)
+vector<NeuralData> NeuralNetwork::SplitIntoMiniBatches(NeuralData trainingData, int miniBatchSize)
 {
 	std::default_random_engine random;
 	random.seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
 	std::uniform_int_distribution<int> discrete(0, (int)trainingData.size() - 1);
 
-	vector<vector<vector<Col<double>>>> Output;
+	vector<NeuralData> Output;
 
 	for (unsigned int index = 0; index < trainingData.size() - 1; index++)
 		swap(trainingData[discrete(random)], trainingData[index]);
@@ -237,7 +239,7 @@ vector<vector<vector<Col<double>>>> NeuralNetwork::SplitIntoMiniBatches(vector<v
 	int NumberOfMiniBatches = (int)trainingData.size() / miniBatchSize;
 	for (int MiniBatchIndex = 0; MiniBatchIndex < NumberOfMiniBatches; MiniBatchIndex++)
 	{
-		Output.push_back(vector<vector<Col<double>>>());
+		Output.push_back(NeuralData());
 		for (int i = MiniBatchIndex; i < MiniBatchIndex + miniBatchSize; i++)
 			Output[MiniBatchIndex].push_back(trainingData[i]);
 	}
