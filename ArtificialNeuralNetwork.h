@@ -14,12 +14,18 @@ using namespace std;
 using namespace arma;
 
 typedef vector<vector<Col<double>>> NeuralData;
+typedef vector<Col<double>> NeuralBiases;
+typedef vector<Mat<double>> NeuralWeights;
+typedef Col<double> NeuralOutput;
+typedef Col<double> NeuralInput;
+typedef Col<double> NeuralError;
+typedef vector<Col<double>> NeuralDataPoint;
 
-Col<double> ActiviationFunction(Col<double> z)
+NeuralOutput ActiviationFunction(NeuralInput z)
 {
 	return 1.0 / (1.0 + exp(-z));
 }
-Col<double> ActivationFunctionPrime(Col<double> z)
+NeuralOutput ActivationFunctionPrime(NeuralInput z)
 {
 	return ActiviationFunction(z) % (1 - ActiviationFunction(z));
 }
@@ -30,7 +36,7 @@ public:
 	NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData));
 	NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData));
 	
-	Col<double> FeedForward(Col<double> a);
+	NeuralOutput FeedForward(NeuralInput a);
 	void StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData);
 
 	void Save(string filename);
@@ -43,14 +49,14 @@ private:
 	int Epoch;
 	int NumberOfLayers;
 	vector<int> sizes;
-	vector<Col<double>> b;
-	vector<Mat<double>> w;
-	vector<Col<double>> empty_b;
-	vector<Mat<double>> empty_w;
+	NeuralBiases b;
+	NeuralWeights w;
+	NeuralBiases empty_b;
+	NeuralWeights empty_w;
 
 	void(*Evaluate)(NeuralNetwork *, NeuralData);
 
-	void Backpropogation(Col<double> x, Col<double> y, vector<Col<double>> * delta_nabla_b, vector<Mat<double>> * delta_nabla_w);
+	void Backpropogation(NeuralInput x, NeuralOutput y, NeuralBiases * delta_nabla_b, NeuralWeights * delta_nabla_w);
 
 	vector<NeuralData> SplitIntoMiniBatches(NeuralData trainingData, int miniBatchSize);
 };
@@ -70,7 +76,7 @@ NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, N
 	Epoch = 0;
 }
 
-Col<double> NeuralNetwork::FeedForward(Col<double> a)
+NeuralOutput NeuralNetwork::FeedForward(NeuralInput a)
 {
 	for (unsigned int l = 0; l < b.size(); l++)
 		a = ActiviationFunction((w[l] * a) + b[l]);
@@ -91,13 +97,13 @@ void NeuralNetwork::StochasticGradientDescent(NeuralData trainingData, int epoch
 
 		for (unsigned int miniBatch = 0; miniBatch < miniBatches.size(); miniBatch++)
 		{
-			vector<Col<double>> nabla_b = empty_b;
-			vector<Mat<double>> nabla_w = empty_w;
+			NeuralBiases nabla_b = empty_b;
+			NeuralWeights nabla_w = empty_w;
 
 			for (unsigned int trainingExample = 0; trainingExample < miniBatches[miniBatch].size(); trainingExample++)
 			{
-				vector<Col<double>> delta_nabla_b = empty_b;
-				vector<Mat<double>> delta_nabla_w = empty_w;
+				NeuralBiases delta_nabla_b = empty_b;
+				NeuralWeights delta_nabla_w = empty_w;
 
 				Backpropogation(miniBatches[miniBatch][trainingExample][0], miniBatches[miniBatch][trainingExample][1], &delta_nabla_b, &delta_nabla_w);
 
@@ -198,12 +204,12 @@ void NeuralNetwork::SetSizes(vector<int> sizes)
 	}
 }
 
-void NeuralNetwork::Backpropogation(Col<double> x, Col<double> y, vector<Col<double>> * delta_nabla_b, vector<Mat<double>> * delta_nabla_w)
+void NeuralNetwork::Backpropogation(NeuralInput x, NeuralOutput y, NeuralBiases * delta_nabla_b, NeuralWeights * delta_nabla_w)
 {
-	Col<double> a = x;
-	vector<Col<double>> as; as.push_back(a);
-	Col<double> z;
-	vector<Col<double>> zs;
+	NeuralOutput a = x;
+	vector<NeuralOutput> as; as.push_back(a);
+	NeuralError z;
+	vector<NeuralError> zs;
 
 	for (unsigned int l = 0; l < b.size(); l++)
 	{
@@ -213,7 +219,7 @@ void NeuralNetwork::Backpropogation(Col<double> x, Col<double> y, vector<Col<dou
 		as.push_back(a);
 	}
 
-	Col<double> delta = (as[as.size() - 1] - y) % ActivationFunctionPrime(zs[zs.size() - 1]);
+	NeuralError delta = (as[as.size() - 1] - y) % ActivationFunctionPrime(zs[zs.size() - 1]);
 	(*delta_nabla_b)[delta_nabla_b->size() - 1] = delta;
 	(*delta_nabla_w)[delta_nabla_w->size() - 1] = delta * as[as.size() - 2].t();
 
