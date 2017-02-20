@@ -39,6 +39,12 @@ void SetSizes(vector<int> sizes);
 ### Typedefs
 ```C++
 typedef vector<vector<Col<double>>> NeuralData;
+typedef vector<Col<double>> NeuralBiases;
+typedef vector<Mat<double>> NeuralWeights;
+typedef Col<double> NeuralOutput;
+typedef Col<double> NeuralInput;
+typedef Col<double> NeuralError;
+typedef vector<Col<double>> NeuralDataPoint;
 ```
 
 ### Example
@@ -78,7 +84,7 @@ void Evaluate(NeuralNetwork * nn, NeuralData testData)
 
 	for (unsigned int testExample = 0; testExample < testData.size(); testExample++)
 	{
-		Col<double> result = nn->FeedForward(testData[testExample][0]);
+		NeuralOutput result = nn->FeedForward(testData[testExample][0]);
 
 		file << testData[testExample][0][0] << " " << result[0] << endl;
 	}
@@ -110,7 +116,7 @@ NeuralData GenerateData(int samples, string filename, double from, double to)
 	NeuralData output;
 	for (int sample = 0; sample < samples; sample++)
 	{
-		output.push_back(vector<Col<double>>());
+		output.push_back(NeuralDataPoint());
 
 		vector<double> x;
 		x.push_back(RandomDouble(from, to));
@@ -120,8 +126,8 @@ NeuralData GenerateData(int samples, string filename, double from, double to)
 		y.push_back(0.5 + 0.25 * cos(4.0 * PI * x.back()));
 		file << y.back() << endl;
 
-		output.back().push_back(Col<double>(x));
-		output.back().push_back(Col<double>(y));
+		output.back().push_back(NeuralInput(x));
+		output.back().push_back(NeuralOutput(y));
 	}
 
 	file.close();
