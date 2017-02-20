@@ -6,8 +6,8 @@ This is not production-worthy code! View this simply as a proof-of-concept.
 
 ### Initialization
 ```C++
-NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData));
-NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData));
+NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL);
+NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL);
 ```
 A `NeuralNetwork` can be initialized two different ways:
 
@@ -26,9 +26,9 @@ This method takes an input to the `NeuralNetwork` and passes it all the way thro
 
 ### Stochastic Gradient Descent
 ```C++
-void StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData);
+void StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData = NeuralData());
 ```
-This method trains the `NeuralNetwork` and optionally evaluates the performance of the network after each epoch using the user-defined `Evaluate` function. For more information about the stochastic gradient descent algorithm, visit the [Wikipedia page](https://en.wikipedia.org/wiki/Stochastic_gradient_descent);
+This method trains the `NeuralNetwork` and optionally evaluates the performance of the network after each epoch using the user-defined `Evaluate` function on `testData`. For more information about the stochastic gradient descent algorithm, visit the [Wikipedia page](https://en.wikipedia.org/wiki/Stochastic_gradient_descent);
 
 ### Save
 ```C++
