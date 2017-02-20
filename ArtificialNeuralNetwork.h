@@ -33,7 +33,9 @@ NeuralOutput ActivationFunctionPrime(NeuralInput z)
 class NeuralNetwork
 {
 public:
+	NeuralNetwork(vector<int> sizes);
 	NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData));
+	NeuralNetwork(string filename);
 	NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData));
 	
 	NeuralOutput FeedForward(NeuralInput a);
@@ -62,6 +64,16 @@ private:
 	vector<NeuralData> SplitIntoMiniBatches(NeuralData trainingData, int miniBatchSize);
 };
 
+NeuralNetwork::NeuralNetwork(vector<int> sizes)
+{
+	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
+	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
+
+	SetSizes(sizes);
+
+	Evaluate = NULL;
+	Epoch = 0;
+}
 NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
 	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
@@ -71,6 +83,16 @@ NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *,
 
 	this->Evaluate = Evaluate;
 	Epoch = 0;	
+}
+NeuralNetwork::NeuralNetwork(string filename)
+{
+	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
+	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
+
+	Open(filename);
+
+	Evaluate = NULL;
+	Epoch = 0;
 }
 NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
@@ -90,11 +112,11 @@ NeuralOutput NeuralNetwork::FeedForward(NeuralInput a)
 
 	return a;
 }
-void NeuralNetwork::StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData)
+void NeuralNetwork::StochasticGradientDescent(NeuralData trainingData, int epochs, int miniBatchSize, double eta, NeuralData testData = NeuralData())
 {
 	Epoch = 0;
 
-	if (testData.size() > 0)
+	if (testData.size() > 0 && Evaluate != NULL)
 		Evaluate(this, testData);
 
 	int n = (int)trainingData.size();
@@ -128,7 +150,7 @@ void NeuralNetwork::StochasticGradientDescent(NeuralData trainingData, int epoch
 			}
 		}
 
-		if (testData.size() > 0)
+		if (testData.size() > 0 && Evaluate != NULL)
 			Evaluate(this, testData);
 	}
 }
