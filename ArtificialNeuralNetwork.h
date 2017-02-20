@@ -64,21 +64,23 @@ private:
 
 NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
+	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
+	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
+
 	SetSizes(sizes);
 
 	this->Evaluate = Evaluate;
-	Epoch = 0;
-	
-	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
+	Epoch = 0;	
 }
 NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
+	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
+	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
+
 	Open(filename);
 
 	this->Evaluate = Evaluate;
 	Epoch = 0;
-	
-	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
 }
 
 NeuralOutput NeuralNetwork::FeedForward(NeuralInput a)
@@ -190,8 +192,6 @@ int NeuralNetwork::GetEpoch()
 }
 void NeuralNetwork::SetSizes(vector<int> sizes)
 {
-	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
-
 	NumberOfLayers = (int)sizes.size();
 	this->sizes = sizes;
 
