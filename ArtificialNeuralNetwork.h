@@ -1,11 +1,11 @@
 #ifndef ARTIFICIAL_NEURAL_NETWORK_HEADER
 #define ARTIFICIAL_NEURAL_NETWORK_HEADER
 
-#include <armadillo>	//Col, Mat, set_seed()
-#include <vector>		//vector, swap()
-#include <random>		//default_random_engine, uniform_int_distribution
-#include <chrono>		//system_clock
-#include <fstream>		//ifstream, ofstream
+#include <armadillo> //Col, Mat, set_seed()
+#include <vector>    //vector, swap()
+#include <random>    //default_random_engine, uniform_int_distribution
+#include <chrono>    //system_clock
+#include <fstream>   //ifstream, ofstream
 
 #pragma comment(lib, "lapack_win64_MT.lib")
 #pragma comment(lib, "blas_win64_MT.lib")
@@ -53,6 +53,7 @@ private:
 	NeuralWeights w;
 	NeuralBiases empty_b;
 	NeuralWeights empty_w;
+	default_random_engine random;
 
 	void(*Evaluate)(NeuralNetwork *, NeuralData);
 
@@ -67,6 +68,8 @@ NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *,
 
 	this->Evaluate = Evaluate;
 	Epoch = 0;
+	
+	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
 }
 NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData))
 {
@@ -74,6 +77,8 @@ NeuralNetwork::NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, N
 
 	this->Evaluate = Evaluate;
 	Epoch = 0;
+	
+	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
 }
 
 NeuralOutput NeuralNetwork::FeedForward(NeuralInput a)
@@ -233,9 +238,7 @@ void NeuralNetwork::Backpropogation(NeuralInput x, NeuralOutput y, NeuralBiases 
 
 vector<NeuralData> NeuralNetwork::SplitIntoMiniBatches(NeuralData trainingData, int miniBatchSize)
 {
-	std::default_random_engine random;
-	random.seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
-	std::uniform_int_distribution<int> discrete(0, (int)trainingData.size() - 1);
+	uniform_int_distribution<int> discrete(0, (int)trainingData.size() - 1);
 
 	vector<NeuralData> Output;
 
