@@ -67,22 +67,22 @@ Since the format of the information passed into the `NeuralNetwork` has a length
 #include <vector>
 #include <fstream>
 
-#define INPUT_NEURONS               1
-#define HIDDEN_NEURONS            100
-#define OUTPUT_NEURONS              1
+#define INPUT_NEURONS                                  1
+#define HIDDEN_NEURONS                               100
+#define OUTPUT_NEURONS                                 1
 
-#define EPOCHS                   1000
-#define MINI_BATCH_SIZE            10
-#define LEARNING_RATE             1.2
+#define EPOCHS                                      1000
+#define MINI_BATCH_SIZE                               10
+#define LEARNING_RATE                                1.2
 
-#define TRAINING_DATA_SIZE       1000
-#define TEST_DATA_SIZE            100
+#define TRAINING_DATA_SIZE                          1000
+#define TEST_DATA_SIZE                               100
 
-#define TRAINING_DATA_RANGE  0.2, 0.8
-#define TEST_DATA_RANGE      0.0, 1.0
+#define TRAINING_DATA_RANGE                     0.2, 0.8
+#define TEST_DATA_RANGE                         0.0, 1.0
 
-#define TRAINING_OUTPUT "training.dat"
-#define TEST_OUTPUT         "test.dat"
+#define TRAINING_OUTPUT                    "training.dat"
+#define TEST_OUTPUT                            "test.dat"
 
 #define PI 3.1415926
 
