@@ -13,13 +13,14 @@
 using namespace std;
 using namespace arma;
 
+typedef vector<int> NeuralDimensions;
 typedef vector<vector<Col<double>>> NeuralData;
+typedef vector<Col<double>> NeuralDataPoint;
 typedef vector<Col<double>> NeuralBiases;
 typedef vector<Mat<double>> NeuralWeights;
 typedef Col<double> NeuralOutput;
 typedef Col<double> NeuralInput;
 typedef Col<double> NeuralError;
-typedef vector<Col<double>> NeuralDataPoint;
 
 NeuralOutput ActiviationFunction(NeuralInput z)
 {
@@ -33,7 +34,7 @@ NeuralOutput ActivationFunctionPrime(NeuralInput z)
 class NeuralNetwork
 {
 public:
-	NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData));
+	NeuralNetwork(NeuralDimensions sizes, void(*Evaluate)(NeuralNetwork *, NeuralData));
 	NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData));
 	
 	NeuralOutput FeedForward(NeuralInput a);
@@ -43,12 +44,12 @@ public:
 	void Open(string filename);
 	
 	int GetEpoch();
-	void SetSizes(vector<int> sizes);
+	void SetSizes(NeuralDimensions sizes);
 
 private:
 	int Epoch;
 	int NumberOfLayers;
-	vector<int> sizes;
+	NeuralDimensions sizes;
 	NeuralBiases b;
 	NeuralWeights w;
 	NeuralBiases empty_b;
@@ -62,7 +63,7 @@ private:
 	vector<NeuralData> SplitIntoMiniBatches(NeuralData trainingData, int miniBatchSize);
 };
 
-NeuralNetwork::NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL)
+NeuralNetwork::NeuralNetwork(NeuralDimensions sizes, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL)
 {
 	arma_rng::set_seed((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
 	random.seed((unsigned int)chrono::system_clock::now().time_since_epoch().count());
@@ -190,7 +191,7 @@ int NeuralNetwork::GetEpoch()
 {
 	return Epoch;
 }
-void NeuralNetwork::SetSizes(vector<int> sizes)
+void NeuralNetwork::SetSizes(NeuralDimensions sizes)
 {
 	NumberOfLayers = (int)sizes.size();
 	this->sizes = sizes;
