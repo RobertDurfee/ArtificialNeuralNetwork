@@ -6,7 +6,7 @@ This is not production-worthy code! View this simply as a proof-of-concept.
 
 ### Initialization
 ```C++
-NeuralNetwork(vector<int> sizes, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL);
+NeuralNetwork(NeuralDimensions sizes, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL);
 NeuralNetwork(string filename, void(*Evaluate)(NeuralNetwork *, NeuralData) = NULL);
 ```
 A `NeuralNetwork` can be initialized two different ways:
@@ -45,12 +45,13 @@ This method opens a `NeuralNetwork` binary file containing the weights, biases, 
 ### Setters/Getters
 ```C++
 int GetEpoch();
-void SetSizes(vector<int> sizes);
+void SetSizes(NeuralDimensions sizes);
 ```
 To allow an `Evaluate` function to know what the most recent epoch completed is, the `GetEpoch` method is provided. Also, to allow altering of the layer dimensions without declaring a new `NeuralNetwork`, the `SetSizes` method is provided. All information about the `NeuralNetwork` will be cleared.
 
 ### Typedefs
 ```C++
+typedef vector<int> NeuralDimensions;
 typedef vector<vector<Col<double>>> NeuralData;
 typedef vector<Col<double>> NeuralBiases;
 typedef vector<Mat<double>> NeuralWeights;
@@ -151,7 +152,7 @@ NeuralData GenerateData(int samples, string filename, double from, double to)
 
 int main()
 {
-	vector<int> sizes = { INPUT_NEURONS, HIDDEN_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS };
+	NeuralDimensions sizes = { INPUT_NEURONS, HIDDEN_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS };
 
 	NeuralNetwork nn(sizes, &Evaluate);
 
