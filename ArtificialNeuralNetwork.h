@@ -246,6 +246,9 @@ vector<NeuralData> NeuralNetwork::SplitIntoMiniBatches(NeuralData trainingData, 
 	for (unsigned int index = 0; index < trainingData.size() - 1; index++)
 		swap(trainingData[discrete(random)], trainingData[index]);
 
+	if (miniBatchSize > (int)trainingData.size())
+		miniBatchSize = (int)trainingData.size();
+	
 	int NumberOfMiniBatches = (int)trainingData.size() / miniBatchSize;
 	for (int MiniBatchIndex = 0; MiniBatchIndex < NumberOfMiniBatches; MiniBatchIndex++)
 	{
